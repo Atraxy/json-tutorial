@@ -41,7 +41,8 @@ static int lept_parse_null(lept_context* c, lept_value* v) {
     v->type = LEPT_NULL;
     return LEPT_PARSE_OK;
 }
-
+#define ISDIGIT(ch)         ((ch) >= '0' && (ch) <= '9')
+#define ISDIGIT1TO9(ch)     ((ch) >= '1' && (ch) <= '9')
 static int lept_parse_number(lept_context* c, lept_value* v) {
     char* end;
     /* \TODO validate number */
@@ -52,7 +53,37 @@ static int lept_parse_number(lept_context* c, lept_value* v) {
     v->type = LEPT_NUMBER;
     return LEPT_PARSE_OK;
 }
-
+static int lept_parse_number(lept_context* c, lept_value* v) {
+    const char* p = c->json;
+    /* \TODO validate number */
+    if(*p=='-')
+        p++;
+    if(*p=='0')
+        p++;
+    else{
+        if(!ISDIGIT1TO9(*p))
+            return LEPT_PARSE_INVALID_VALUE;
+        for(P++;ISDIGIT(*p);p++)   
+    }
+    if(*p=='.'){
+        p++;
+        if(!ISDIGIT(*p))
+            return LEPT_PARSE_INVALID_VALUE;
+        for(p++;ISDIGIT(*p);p++)
+    }
+    if(*p=='e'||*p=='E'){
+        p++;
+        if(*p=='+'||*p=='-')p++;
+        if(!ISDIGIT(*p)) return LEPT_PARSE_INVALID_VALUE;
+        for(p++;ISDIGIT(*P);p++)
+    }
+    
+    v->n = strtod(c->json, null);
+   
+    c->json = p;
+    v->type = LEPT_NUMBER;
+    return LEPT_PARSE_OK;
+}
 static int lept_parse_value(lept_context* c, lept_value* v) {
     switch (*c->json) {
         case 't':  return lept_parse_true(c, v);
